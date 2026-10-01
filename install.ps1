@@ -1,6 +1,6 @@
 # ============================================================
 #                    VORTEX OVERLAY
-#                     
+#
 #                       INSTALLER
 # ============================================================
 
@@ -12,20 +12,29 @@ $ErrorActionPreference = "Stop"
 
 $DownloadUrl = "https://github.com/Vortex-oZ5/Vortex-Overlay/releases/latest/download/vortex-overlay.zip"
 
+# Current access key
 $CorrectKey = "VORTEX05Z"
 
+# Installation directory
 $DefaultInstallDir = Join-Path $env:LOCALAPPDATA "VortexOverlay"
 
-$TempZip = Join-Path $env:TEMP "vortex-overlay.zip"
+# Temporary files
+$TempZip   = Join-Path $env:TEMP "vortex-overlay.zip"
+$TempSteps = Join-Path $env:TEMP "vortex-steps-to-run"
 
-# RED + WHITE THEME
-$Red    = "Red"
+# Installation instructions
+$StepsUrl = "https://raw.githubusercontent.com/Vortex-oZ5/Vortex-Overlay/main/steps%20to%20run"
+
+# ============================================================
+# COLORS
+# ============================================================
+
+$Red     = "Red"
 $DarkRed = "DarkRed"
-$White  = "White"
-$Gray   = "DarkGray"
-$Green  = "Green"
-$Yellow = "Yellow"
-
+$White   = "White"
+$Gray    = "DarkGray"
+$Green   = "Green"
+$Yellow  = "Yellow"
 
 # ============================================================
 # CONSOLE SETUP
@@ -41,12 +50,12 @@ try {
 }
 catch {}
 
-
 # ============================================================
-# HELPER - TYPE EFFECT
+# TYPE EFFECT
 # ============================================================
 
 function Write-TypeEffect {
+
     param(
         [string]$Text,
         [ConsoleColor]$Color = "White",
@@ -55,7 +64,9 @@ function Write-TypeEffect {
 
     foreach ($Character in $Text.ToCharArray()) {
 
-        Write-Host $Character -NoNewline -ForegroundColor $Color
+        Write-Host $Character `
+            -NoNewline `
+            -ForegroundColor $Color
 
         Start-Sleep -Milliseconds $Delay
     }
@@ -63,12 +74,12 @@ function Write-TypeEffect {
     Write-Host ""
 }
 
-
 # ============================================================
-# HELPER - SPINNER
+# SPINNER
 # ============================================================
 
 function Show-Spinner {
+
     param(
         [string]$Message,
         [int]$Seconds = 2
@@ -106,9 +117,9 @@ function Show-Spinner {
         Start-Sleep -Milliseconds 80
     }
 
-    Write-Host "`r  [✓] $Message" -ForegroundColor $White
+    Write-Host "`r  [✓] $Message" `
+        -ForegroundColor $White
 }
-
 
 # ============================================================
 # VORTEX BANNER
@@ -128,36 +139,40 @@ function Show-VortexBanner {
     Write-Host "  ╚═══╝   ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═╝" -ForegroundColor $Red
 
     Write-Host ""
+
     Write-Host "                 VORTEX OVERLAY" -ForegroundColor $White
     Write-Host "                  RED EDITION" -ForegroundColor $Red
+
     Write-Host ""
 
     Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor $Red
-    Write-Host "                  INSTALLER" -ForegroundColor $White
+    Write-Host "                    INSTALLER" -ForegroundColor $White
     Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor $Red
 
     Write-Host ""
 }
-
 
 # ============================================================
 # ERROR FUNCTION
 # ============================================================
 
 function Show-ErrorAndExit {
+
     param(
         [string]$Message
     )
 
     Write-Host ""
-    Write-Host "  [X] $Message" -ForegroundColor $Red
+
+    Write-Host "  [X] $Message" `
+        -ForegroundColor $Red
+
     Write-Host ""
 
     Read-Host "Press ENTER to close"
 
     exit
 }
-
 
 # ============================================================
 # START
@@ -176,7 +191,6 @@ Show-Spinner `
     "Preparing installation environment" `
     1
 
-
 # ============================================================
 # ACCESS KEY
 # ============================================================
@@ -185,6 +199,7 @@ Write-Host ""
 
 Write-Host "  ACCESS REQUIRED" -ForegroundColor $Red
 Write-Host "  ────────────────────────────────────────" -ForegroundColor $White
+
 Write-Host ""
 
 $EnteredKey = Read-Host "  Enter access key"
@@ -192,9 +207,15 @@ $EnteredKey = Read-Host "  Enter access key"
 if ($EnteredKey -ne $CorrectKey) {
 
     Write-Host ""
-    Write-Host "  [X] INVALID ACCESS KEY" -ForegroundColor $Red
+
+    Write-Host "  [X] INVALID ACCESS KEY" `
+        -ForegroundColor $Red
+
     Write-Host ""
-    Write-Host "  Access denied." -ForegroundColor $White
+
+    Write-Host "  Access denied." `
+        -ForegroundColor $White
+
     Write-Host ""
 
     Read-Host "Press ENTER to close"
@@ -203,28 +224,40 @@ if ($EnteredKey -ne $CorrectKey) {
 }
 
 Write-Host ""
-Write-Host "  [✓] ACCESS GRANTED" -ForegroundColor $Red
+
+Write-Host "  [✓] ACCESS GRANTED" `
+    -ForegroundColor $Red
+
 Write-Host ""
 
 Show-Spinner `
     "Authenticating VORTEX" `
     1
 
-
 # ============================================================
 # INSTALLATION LOCATION
 # ============================================================
 
 Write-Host ""
-Write-Host "  INSTALLATION LOCATION" -ForegroundColor $Red
-Write-Host "  ────────────────────────────────────────" -ForegroundColor $White
+
+Write-Host "  INSTALLATION LOCATION" `
+    -ForegroundColor $Red
+
+Write-Host "  ────────────────────────────────────────" `
+    -ForegroundColor $White
+
 Write-Host ""
 
-Write-Host "  Default location:" -ForegroundColor $Gray
-Write-Host "  $DefaultInstallDir" -ForegroundColor $White
+Write-Host "  Default location:" `
+    -ForegroundColor $Gray
+
+Write-Host "  $DefaultInstallDir" `
+    -ForegroundColor $White
+
 Write-Host ""
 
-$InstallInput = Read-Host "  Enter installation path (ENTER = default)"
+$InstallInput = Read-Host `
+    "  Enter installation path (ENTER = default)"
 
 if ([string]::IsNullOrWhiteSpace($InstallInput)) {
 
@@ -236,10 +269,14 @@ else {
 }
 
 Write-Host ""
-Write-Host "  Selected location:" -ForegroundColor $Gray
-Write-Host "  $InstallDir" -ForegroundColor $White
-Write-Host ""
 
+Write-Host "  Selected location:" `
+    -ForegroundColor $Gray
+
+Write-Host "  $InstallDir" `
+    -ForegroundColor $White
+
+Write-Host ""
 
 # ============================================================
 # PREPARE DIRECTORY
@@ -249,7 +286,8 @@ try {
 
     if (Test-Path $InstallDir) {
 
-        Write-Host "  Existing installation detected." -ForegroundColor $Red
+        Write-Host "  Existing installation detected." `
+            -ForegroundColor $Red
 
         Show-Spinner `
             "Removing previous installation" `
@@ -268,7 +306,9 @@ try {
         -Force `
         -ErrorAction Stop | Out-Null
 
-    Write-Host "  [✓] Installation directory ready." -ForegroundColor $Red
+    Write-Host ""
+    Write-Host "  [✓] Installation directory ready." `
+        -ForegroundColor $Red
 }
 catch {
 
@@ -276,9 +316,8 @@ catch {
         "Could not prepare the installation directory."
 }
 
-
 # ============================================================
-# REMOVE OLD TEMP ZIP
+# REMOVE OLD TEMP FILES
 # ============================================================
 
 if (Test-Path $TempZip) {
@@ -289,14 +328,23 @@ if (Test-Path $TempZip) {
         -ErrorAction SilentlyContinue
 }
 
+if (Test-Path $TempSteps) {
+
+    Remove-Item `
+        -Path $TempSteps `
+        -Force `
+        -ErrorAction SilentlyContinue
+}
 
 # ============================================================
 # INSTALLATION NOTICE POPUP
 # ============================================================
 
-Add-Type -AssemblyName PresentationFramework
+try {
 
-$Message = @"
+    Add-Type -AssemblyName PresentationFramework
+
+    $Message = @"
 WELCOME TO VORTEX OVERLAY
 
 Please read before continuing.
@@ -317,24 +365,34 @@ $InstallDir
 Click OK to begin the download.
 "@
 
-$PopupResult = [System.Windows.MessageBox]::Show(
-    $Message,
-    "VORTEX OVERLAY",
-    [System.Windows.MessageBoxButton]::OK,
-    [System.Windows.MessageBoxImage]::Information
-)
+    $PopupResult = [System.Windows.MessageBox]::Show(
+        $Message,
+        "VORTEX OVERLAY",
+        [System.Windows.MessageBoxButton]::OK,
+        [System.Windows.MessageBoxImage]::Information
+    )
 
-if ($PopupResult -ne [System.Windows.MessageBoxResult]::OK) {
+    if ($PopupResult -ne [System.Windows.MessageBoxResult]::OK) {
 
-    Write-Host ""
-    Write-Host "  Installation cancelled." -ForegroundColor $Red
-    Write-Host ""
+        Write-Host ""
 
-    Read-Host "Press ENTER to close"
+        Write-Host "  Installation cancelled." `
+            -ForegroundColor $Red
 
-    exit
+        Write-Host ""
+
+        Read-Host "Press ENTER to close"
+
+        exit
+    }
 }
+catch {
 
+    Write-Host ""
+    Write-Host "  Popup unavailable. Continuing..." `
+        -ForegroundColor $Yellow
+    Write-Host ""
+}
 
 # ============================================================
 # DOWNLOAD
@@ -345,8 +403,13 @@ Clear-Host
 Show-VortexBanner
 
 Write-Host ""
-Write-Host "  DOWNLOAD" -ForegroundColor $Red
-Write-Host "  ────────────────────────────────────────" -ForegroundColor $White
+
+Write-Host "  DOWNLOAD" `
+    -ForegroundColor $Red
+
+Write-Host "  ────────────────────────────────────────" `
+    -ForegroundColor $White
+
 Write-Host ""
 
 Write-TypeEffect `
@@ -360,13 +423,16 @@ try {
 
     Add-Type -AssemblyName System.Net.Http
 
-    $Handler = New-Object System.Net.Http.HttpClientHandler
+    $Handler = New-Object `
+        System.Net.Http.HttpClientHandler
 
     $Handler.AllowAutoRedirect = $true
 
-    $Client = New-Object System.Net.Http.HttpClient($Handler)
+    $Client = New-Object `
+        System.Net.Http.HttpClient($Handler)
 
-    $Client.Timeout = [TimeSpan]::FromMinutes(30)
+    $Client.Timeout = `
+        [TimeSpan]::FromMinutes(30)
 
     $Response = $Client.GetAsync(
         $DownloadUrl,
@@ -378,11 +444,14 @@ try {
         throw "Download failed. HTTP $([int]$Response.StatusCode)"
     }
 
-    $TotalBytes = $Response.Content.Headers.ContentLength
+    $TotalBytes = `
+        $Response.Content.Headers.ContentLength
 
-    $InputStream = $Response.Content.ReadAsStreamAsync().Result
+    $InputStream = `
+        $Response.Content.ReadAsStreamAsync().Result
 
-    $OutputStream = [System.IO.File]::Create($TempZip)
+    $OutputStream = `
+        [System.IO.File]::Create($TempZip)
 
     $Buffer = New-Object byte[] 65536
 
@@ -426,7 +495,8 @@ try {
                     ($Percent / 100) * $BarLength
                 )
 
-                $Empty = $BarLength - $Filled
+                $Empty = `
+                    $BarLength - $Filled
 
                 $Bar =
                     ("█" * $Filled) +
@@ -459,8 +529,8 @@ try {
     Write-Host ""
     Write-Host ""
 
-    Write-Host "  [✓] DOWNLOAD COMPLETE" -ForegroundColor $Red
-
+    Write-Host "  [✓] DOWNLOAD COMPLETE" `
+        -ForegroundColor $Red
 }
 catch {
 
@@ -488,6 +558,53 @@ catch {
         "Download failed. Check your internet connection or download source."
 }
 
+# ============================================================
+# DOWNLOAD STEPS TO RUN
+# ============================================================
+
+Write-Host ""
+
+Write-Host "  INSTALLATION STEPS" `
+    -ForegroundColor $Red
+
+Write-Host "  ────────────────────────────────────────" `
+    -ForegroundColor $White
+
+Write-Host ""
+
+Write-TypeEffect `
+    "  Downloading installation instructions..." `
+    $White `
+    8
+
+try {
+
+    Invoke-WebRequest `
+        -Uri $StepsUrl `
+        -OutFile $TempSteps `
+        -UseBasicParsing `
+        -ErrorAction Stop
+
+    if (-not (Test-Path $TempSteps)) {
+
+        throw "Steps file was not created."
+    }
+
+    Write-Host ""
+
+    Write-Host "  [✓] STEPS TO RUN DOWNLOADED" `
+        -ForegroundColor $Red
+}
+catch {
+
+    Write-Host ""
+
+    Write-Host "  [!] Could not download 'steps to run'." `
+        -ForegroundColor $Yellow
+
+    Write-Host "      Main installation will continue." `
+        -ForegroundColor $White
+}
 
 # ============================================================
 # VERIFY ZIP
@@ -505,7 +622,8 @@ if (-not (Test-Path $TempZip)) {
         "Downloaded ZIP was not found."
 }
 
-$ZipSize = (Get-Item $TempZip).Length
+$ZipSize = `
+    (Get-Item $TempZip).Length
 
 if ($ZipSize -lt 1024) {
 
@@ -518,16 +636,21 @@ if ($ZipSize -lt 1024) {
         "Downloaded package appears to be invalid."
 }
 
-Write-Host "  [✓] PACKAGE VERIFIED" -ForegroundColor $Red
-Write-Host ""
+Write-Host "  [✓] PACKAGE VERIFIED" `
+    -ForegroundColor $Red
 
+Write-Host ""
 
 # ============================================================
 # EXTRACTION
 # ============================================================
 
-Write-Host "  EXTRACTION" -ForegroundColor $Red
-Write-Host "  ────────────────────────────────────────" -ForegroundColor $White
+Write-Host "  EXTRACTION" `
+    -ForegroundColor $Red
+
+Write-Host "  ────────────────────────────────────────" `
+    -ForegroundColor $White
+
 Write-Host ""
 
 try {
@@ -535,7 +658,8 @@ try {
     Add-Type -AssemblyName System.IO.Compression
     Add-Type -AssemblyName System.IO.Compression.FileSystem
 
-    $Archive = [System.IO.Compression.ZipFile]::OpenRead($TempZip)
+    $Archive = `
+        [System.IO.Compression.ZipFile]::OpenRead($TempZip)
 
     $Entries = $Archive.Entries
 
@@ -558,16 +682,20 @@ try {
 
     foreach ($Entry in $Entries) {
 
-        $RelativePath = $Entry.FullName.Replace("/", "\")
+        $RelativePath = `
+            $Entry.FullName.Replace("/", "\")
 
-        $DestinationPath = [System.IO.Path]::GetFullPath(
-            (Join-Path $InstallDir $RelativePath)
-        )
+        $DestinationPath = `
+            [System.IO.Path]::GetFullPath(
+                (Join-Path $InstallDir $RelativePath)
+            )
 
-        $InstallRoot = [System.IO.Path]::GetFullPath(
-            $InstallDir
-        )
+        $InstallRoot = `
+            [System.IO.Path]::GetFullPath(
+                $InstallDir
+            )
 
+        # Prevent ZIP path traversal
         if (-not $DestinationPath.StartsWith(
             $InstallRoot,
             [System.StringComparison]::OrdinalIgnoreCase
@@ -576,6 +704,7 @@ try {
             throw "Unsafe path detected in archive."
         }
 
+        # Directory
         if ([string]::IsNullOrEmpty($Entry.Name)) {
 
             New-Item `
@@ -587,9 +716,11 @@ try {
             continue
         }
 
-        $ParentDirectory = Split-Path `
-            $DestinationPath `
-            -Parent
+        # Parent directory
+        $ParentDirectory = `
+            Split-Path `
+                $DestinationPath `
+                -Parent
 
         if ($ParentDirectory) {
 
@@ -600,6 +731,7 @@ try {
                 -ErrorAction Stop | Out-Null
         }
 
+        # Extract file
         [System.IO.Compression.ZipFileExtensions]::ExtractToFile(
             $Entry,
             $DestinationPath,
@@ -618,7 +750,8 @@ try {
             ($Percent / 100) * $BarLength
         )
 
-        $Empty = $BarLength - $Filled
+        $Empty = `
+            $BarLength - $Filled
 
         $Bar =
             ("█" * $Filled) +
@@ -628,10 +761,8 @@ try {
 
         if ($FileName.Length -gt 30) {
 
-            $FileName = $FileName.Substring(
-                0,
-                27
-            ) + "..."
+            $FileName = `
+                $FileName.Substring(0,27) + "..."
         }
 
         Write-Host (
@@ -646,8 +777,8 @@ try {
     Write-Host ""
     Write-Host ""
 
-    Write-Host "  [✓] EXTRACTION COMPLETE" -ForegroundColor $Red
-
+    Write-Host "  [✓] EXTRACTION COMPLETE" `
+        -ForegroundColor $Red
 }
 catch {
 
@@ -656,9 +787,15 @@ catch {
     }
 
     Write-Host ""
-    Write-Host "  [X] EXTRACTION FAILED" -ForegroundColor $Red
+
+    Write-Host "  [X] EXTRACTION FAILED" `
+        -ForegroundColor $Red
+
     Write-Host ""
-    Write-Host $_.Exception.Message -ForegroundColor $White
+
+    Write-Host $_.Exception.Message `
+        -ForegroundColor $White
+
     Write-Host ""
 
     if (Test-Path $TempZip) {
@@ -669,11 +806,81 @@ catch {
             -ErrorAction SilentlyContinue
     }
 
+    if (Test-Path $TempSteps) {
+
+        Remove-Item `
+            $TempSteps `
+            -Force `
+            -ErrorAction SilentlyContinue
+    }
+
     Read-Host "Press ENTER to close"
 
     exit
 }
 
+# ============================================================
+# INSTALL STEPS FILE
+# ============================================================
+
+Write-Host ""
+
+Write-Host "  INSTALLING SETUP INSTRUCTIONS" `
+    -ForegroundColor $Red
+
+Write-Host "  ────────────────────────────────────────" `
+    -ForegroundColor $White
+
+Write-Host ""
+
+if (Test-Path $TempSteps) {
+
+    $InstalledSteps = `
+        Join-Path $InstallDir "steps to run"
+
+    $StepsFrames = @(
+        "[■□□□□□□□□□]",
+        "[■■□□□□□□□□]",
+        "[■■■□□□□□□□]",
+        "[■■■■□□□□□□]",
+        "[■■■■■□□□□□]",
+        "[■■■■■■□□□□]",
+        "[■■■■■■■□□□]",
+        "[■■■■■■■■□□]",
+        "[■■■■■■■■■□]",
+        "[■■■■■■■■■■]"
+    )
+
+    foreach ($Frame in $StepsFrames) {
+
+        Write-Host "`r  $Frame Installing steps to run..." `
+            -NoNewline `
+            -ForegroundColor $Red
+
+        Start-Sleep -Milliseconds 80
+    }
+
+    Write-Host ""
+
+    Copy-Item `
+        -Path $TempSteps `
+        -Destination $InstalledSteps `
+        -Force `
+        -ErrorAction Stop
+
+    Write-Host ""
+
+    Write-Host "  [✓] STEPS TO RUN INSTALLED" `
+        -ForegroundColor $Red
+
+    Write-Host "      $InstalledSteps" `
+        -ForegroundColor $Gray
+}
+else {
+
+    Write-Host "  [!] STEPS TO RUN WAS NOT INSTALLED" `
+        -ForegroundColor $Yellow
+}
 
 # ============================================================
 # CLEANUP
@@ -687,19 +894,30 @@ Show-Spinner `
 
 try {
 
-    Remove-Item `
-        -Path $TempZip `
-        -Force `
-        -ErrorAction Stop
+    if (Test-Path $TempZip) {
 
-    Write-Host "  [✓] TEMPORARY ZIP REMOVED" -ForegroundColor $Red
+        Remove-Item `
+            -Path $TempZip `
+            -Force `
+            -ErrorAction Stop
+    }
 
+    Write-Host "  [✓] TEMPORARY ZIP REMOVED" `
+        -ForegroundColor $Red
 }
 catch {
 
-    Write-Host "  [!] ZIP could not be deleted." -ForegroundColor $Yellow
+    Write-Host "  [!] ZIP could not be deleted." `
+        -ForegroundColor $Yellow
 }
 
+if (Test-Path $TempSteps) {
+
+    Remove-Item `
+        -Path $TempSteps `
+        -Force `
+        -ErrorAction SilentlyContinue
+}
 
 # ============================================================
 # VERIFY INSTALLATION
@@ -711,11 +929,12 @@ Show-Spinner `
     "Finalizing installation" `
     1
 
-$InstalledFiles = Get-ChildItem `
-    -Path $InstallDir `
-    -Recurse `
-    -File `
-    -ErrorAction SilentlyContinue
+$InstalledFiles = `
+    Get-ChildItem `
+        -Path $InstallDir `
+        -Recurse `
+        -File `
+        -ErrorAction SilentlyContinue
 
 if (-not $InstalledFiles) {
 
@@ -724,10 +943,11 @@ if (-not $InstalledFiles) {
 }
 
 Write-Host ""
-Write-Host "  [✓] INSTALLATION VERIFIED" -ForegroundColor $Red
+
+Write-Host "  [✓] INSTALLATION VERIFIED" `
+    -ForegroundColor $Red
 
 Start-Sleep -Milliseconds 700
-
 
 # ============================================================
 # FINAL ANIMATION
@@ -768,7 +988,6 @@ foreach ($Frame in $FinalFrames) {
 Write-Host ""
 Write-Host ""
 
-
 # ============================================================
 # ALL DONE
 # ============================================================
@@ -782,25 +1001,41 @@ Write-Host "╚═╝  ╚═╝╚══════╝╚══════╝
 
 Write-Host ""
 
-Write-Host "                 GOOD TO GO....." -ForegroundColor $White
+Write-Host "                 GOOD TO GO....." `
+    -ForegroundColor $White
 
 Write-Host ""
 
-Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor $Red
-
-Write-Host ""
-Write-Host "       VORTEX OVERLAY INSTALLED SUCCESSFULLY" -ForegroundColor $White
-
-Write-Host ""
-Write-Host "       Location:" -ForegroundColor $Gray
-Write-Host "       $InstallDir" -ForegroundColor $White
-
-Write-Host ""
-Write-Host "       ZIP automatically deleted." -ForegroundColor $Gray
+Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" `
+    -ForegroundColor $Red
 
 Write-Host ""
 
-Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor $Red
+Write-Host "       VORTEX OVERLAY INSTALLED SUCCESSFULLY" `
+    -ForegroundColor $White
+
+Write-Host ""
+
+Write-Host "       Location:" `
+    -ForegroundColor $Gray
+
+Write-Host "       $InstallDir" `
+    -ForegroundColor $White
+
+Write-Host ""
+
+Write-Host "       steps to run installed automatically." `
+    -ForegroundColor $Gray
+
+Write-Host ""
+
+Write-Host "       ZIP automatically deleted." `
+    -ForegroundColor $Gray
+
+Write-Host ""
+
+Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" `
+    -ForegroundColor $Red
 
 Write-Host ""
 
