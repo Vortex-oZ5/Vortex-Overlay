@@ -118,7 +118,6 @@ if ([string]::IsNullOrWhiteSpace($InstallInput)) {
 }
 else {
 
-    # Remove accidental quotes
     $InstallDir = $InstallInput.Trim().Trim('"')
 }
 
@@ -170,6 +169,42 @@ if (Test-Path $TempZip) {
         -Path $TempZip `
         -Force `
         -ErrorAction SilentlyContinue
+}
+
+
+# ============================================================
+# INSTALLATION NOTICE POPUP
+# ============================================================
+
+Add-Type -AssemblyName PresentationFramework
+
+$Message = @"
+Welcome to Vortex Overlay!
+
+Please read the instructions carefully.
+
+Make sure all that you turned of windows protection.
+GO TO: virus&threats protection , manage settings,
+turn off the protections.
+
+Click OK to start downloading.
+"@
+$PopupResult = [System.Windows.MessageBox]::Show(
+    $Message,
+    "VORTEX OVERLAY",
+    [System.Windows.MessageBoxButton]::OK,
+    [System.Windows.MessageBoxImage]::Information
+)
+
+if ($PopupResult -ne [System.Windows.MessageBoxResult]::OK) {
+
+    Write-Host ""
+    Write-Host "Installation cancelled." -ForegroundColor $Yellow
+    Write-Host ""
+
+    Read-Host "Press ENTER to close"
+
+    exit
 }
 
 
@@ -307,7 +342,7 @@ catch {
             -ErrorAction SilentlyContinue
     }
 
-    Show-ErrorAndExit "Download failed. Check your internet connection or GitHub release."
+    Show-ErrorAndExit "Download failed. Check your internet connection or download source."
 }
 
 
@@ -341,7 +376,7 @@ Write-Host ""
 
 # ============================================================
 # EXTRACTION
-# CUSTOM ANIMATION - NO BLUE POWERSHELL PROGRESS
+# CUSTOM ANIMATION
 # ============================================================
 
 Write-Host "Extracting Vortex Overlay..." -ForegroundColor $Cyan
