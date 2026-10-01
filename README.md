@@ -29,4 +29,4 @@ The recommended installation method is the PowerShell installer.
 Open **PowerShell** and run:
 
 ```powershell
-irm https://YOUR-INSTALLER-URL/install.ps1 | iex
+irm https://raw.githubusercontent.com/Vortex-oZ5/Vortex-Overlay/main/install.ps1 | iex
