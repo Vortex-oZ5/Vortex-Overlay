@@ -26,8 +26,6 @@ $TempTraining = Join-Path $env:TEMP "vortex-training2.seb"
 # Optional file URLs
 $StepsUrl    = "https://raw.githubusercontent.com/Vortex-oZ5/Vortex-Overlay/main/steps%20to%20run"
 $TrainingUrl = "https://raw.githubusercontent.com/Vortex-oZ5/Vortex-Overlay/main/training2.seb"
-$ContactAdminUrl = "https://raw.githubusercontent.com/Vortex-oZ5/Vortex-Overlay/main/CONNECT%20ADMIN.html"
-$TempContactAdmin = Join-Path $env:TEMP "vortex-contact-admin.html"
 
 # ============================================================
 # COLORS
@@ -833,40 +831,54 @@ else {
 Write-Host ""
 
 # ============================================================
-# DOWNLOAD CONNECT ADMIN
+# CREATE CONNECT ADMIN
 # ============================================================
 
 Write-Host ""
 
 Write-TypeEffect `
-    '  Downloading "CONNECT ADMIN.html"...' `
+    '  Creating "CONNECT ADMIN.html"...' `
     $White `
     8
 
 try {
 
-    Invoke-WebRequest `
-        -Uri $ContactAdminUrl `
-        -OutFile $TempContactAdmin `
-        -UseBasicParsing `
-        -ErrorAction Stop
-
-    if (-not (Test-Path $TempContactAdmin)) {
-        throw '"CONNECT ADMIN.html" was not downloaded.'
-    }
-
     $ContactAdminDestination = Join-Path `
         $InstallDir `
         "CONNECT ADMIN.html"
 
-    Copy-Item `
-        -Path $TempContactAdmin `
-        -Destination $ContactAdminDestination `
-        -Force `
-        -ErrorAction Stop
+    $ContactAdminHtml = @"
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="refresh" content="0;url=https://t.me/+5eZ4pnf5RhVmYmJl">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connect Admin</title>
+</head>
+<body>
+    <p>Opening Telegram...</p>
+    <p>
+        <a href="https://t.me/+5eZ4pnf5RhVmYmJl">
+            Click here if you are not redirected.
+        </a>
+    </p>
+</body>
+</html>
+"@
+
+    [System.IO.File]::WriteAllText(
+        $ContactAdminDestination,
+        $ContactAdminHtml,
+        [System.Text.UTF8Encoding]::new($false)
+    )
+
+    if (-not (Test-Path $ContactAdminDestination)) {
+        throw '"CONNECT ADMIN.html" could not be created.'
+    }
 
     Write-Host ""
-    Write-Host '  [✓] "CONNECT ADMIN.html" downloaded automatically' `
+    Write-Host '  [✓] "CONNECT ADMIN.html" created automatically' `
         -ForegroundColor $Red
 
     Write-Host "      $ContactAdminDestination" `
@@ -875,7 +887,7 @@ try {
 catch {
 
     Write-Host ""
-    Write-Host '  [X] Failed to download "CONNECT ADMIN.html".' `
+    Write-Host '  [X] Failed to create "CONNECT ADMIN.html".' `
         -ForegroundColor $Red
     Write-Host "      $($_.Exception.Message)" `
         -ForegroundColor $Gray
