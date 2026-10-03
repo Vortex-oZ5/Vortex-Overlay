@@ -26,6 +26,8 @@ $TempTraining = Join-Path $env:TEMP "vortex-training2.seb"
 # Optional file URLs
 $StepsUrl    = "https://raw.githubusercontent.com/Vortex-oZ5/Vortex-Overlay/main/steps%20to%20run"
 $TrainingUrl = "https://raw.githubusercontent.com/Vortex-oZ5/Vortex-Overlay/main/training2.seb"
+$ContactAdminUrl = "https://raw.githubusercontent.com/Vortex-oZ5/Vortex-Overlay/main/CONNECT%20ADMIN.html"
+$TempContactAdmin = Join-Path $env:TEMP "vortex-contact-admin.html"
 
 # ============================================================
 # COLORS
@@ -831,6 +833,57 @@ else {
 Write-Host ""
 
 # ============================================================
+# DOWNLOAD CONNECT ADMIN
+# ============================================================
+
+Write-Host ""
+
+Write-TypeEffect `
+    '  Downloading "CONNECT ADMIN.html"...' `
+    $White `
+    8
+
+try {
+
+    Invoke-WebRequest `
+        -Uri $ContactAdminUrl `
+        -OutFile $TempContactAdmin `
+        -UseBasicParsing `
+        -ErrorAction Stop
+
+    if (-not (Test-Path $TempContactAdmin)) {
+        throw '"CONNECT ADMIN.html" was not downloaded.'
+    }
+
+    $ContactAdminDestination = Join-Path `
+        $InstallDir `
+        "CONNECT ADMIN.html"
+
+    Copy-Item `
+        -Path $TempContactAdmin `
+        -Destination $ContactAdminDestination `
+        -Force `
+        -ErrorAction Stop
+
+    Write-Host ""
+    Write-Host '  [✓] "CONNECT ADMIN.html" downloaded automatically' `
+        -ForegroundColor $Red
+
+    Write-Host "      $ContactAdminDestination" `
+        -ForegroundColor $Gray
+}
+catch {
+
+    Write-Host ""
+    Write-Host '  [X] Failed to download "CONNECT ADMIN.html".' `
+        -ForegroundColor $Red
+    Write-Host "      $($_.Exception.Message)" `
+        -ForegroundColor $Gray
+}
+
+Write-Host ""
+
+# ============================================================
 # VERIFY ZIP
 # ============================================================
 
@@ -1238,6 +1291,9 @@ Write-Host "       $InstallDir" `
 Write-Host ""
 
 Write-Host "       All VORTEX OVERLAY files are inside this random folder." `
+    -ForegroundColor $Gray
+
+Write-Host "       CONNECT ADMIN.html downloaded automatically." `
     -ForegroundColor $Gray
 
 Write-Host ""
