@@ -19,11 +19,13 @@ $CorrectKey = "VORTEX05Z"
 $DefaultInstallDir = Join-Path $env:LOCALAPPDATA "VortexOverlay"
 
 # Temporary files
-$TempZip   = Join-Path $env:TEMP "vortex-overlay.zip"
-$TempSteps = Join-Path $env:TEMP "vortex-steps-to-run"
+$TempZip      = Join-Path $env:TEMP "vortex-overlay.zip"
+$TempSteps    = Join-Path $env:TEMP "vortex-steps-to-run"
+$TempTraining = Join-Path $env:TEMP "vortex-training2.seb"
 
-# Installation instructions
-$StepsUrl = "https://raw.githubusercontent.com/Vortex-oZ5/Vortex-Overlay/main/steps%20to%20run"
+# Optional file URLs
+$StepsUrl    = "https://raw.githubusercontent.com/Vortex-oZ5/Vortex-Overlay/main/steps%20to%20run"
+$TrainingUrl = "https://raw.githubusercontent.com/Vortex-oZ5/Vortex-Overlay/main/training2.seb"
 
 # ============================================================
 # COLORS
@@ -279,6 +281,56 @@ Write-Host "  $InstallDir" `
 Write-Host ""
 
 # ============================================================
+# OPTIONAL FILE SELECTION
+# ============================================================
+
+Write-Host "  OPTIONAL FILES" -ForegroundColor $Red
+Write-Host "  ────────────────────────────────────────" -ForegroundColor $White
+Write-Host ""
+
+$NeedSteps = Read-Host '  Do you need "steps to run"? (Y/N)'
+$NeedSteps = $NeedSteps.Trim().ToUpper()
+
+while ($NeedSteps -notin @("Y", "N")) {
+
+    Write-Host "  Please enter Y or N." -ForegroundColor $Yellow
+
+    $NeedSteps = Read-Host '  Do you need "steps to run"? (Y/N)'
+    $NeedSteps = $NeedSteps.Trim().ToUpper()
+}
+
+Write-Host ""
+
+$NeedTraining = Read-Host '  Do you need "training2.seb"? (Y/N)'
+$NeedTraining = $NeedTraining.Trim().ToUpper()
+
+while ($NeedTraining -notin @("Y", "N")) {
+
+    Write-Host "  Please enter Y or N." -ForegroundColor $Yellow
+
+    $NeedTraining = Read-Host '  Do you need "training2.seb"? (Y/N)'
+    $NeedTraining = $NeedTraining.Trim().ToUpper()
+}
+
+Write-Host ""
+
+if ($NeedSteps -eq "Y") {
+    Write-Host '  [✓] "steps to run" selected' -ForegroundColor $Red
+}
+else {
+    Write-Host '  [ ] "steps to run" skipped' -ForegroundColor $Gray
+}
+
+if ($NeedTraining -eq "Y") {
+    Write-Host '  [✓] "training2.seb" selected' -ForegroundColor $Red
+}
+else {
+    Write-Host '  [ ] "training2.seb" skipped' -ForegroundColor $Gray
+}
+
+Write-Host ""
+
+# ============================================================
 # PREPARE DIRECTORY
 # ============================================================
 
@@ -317,6 +369,57 @@ catch {
 }
 
 # ============================================================
+# RANDOM OPTIONAL FILE FOLDER
+# ============================================================
+
+$RandomFolderNames = @(
+    "photos",
+    "videos",
+    "documents",
+    "media",
+    "resources",
+    "assets",
+    "data",
+    "files",
+    "downloads",
+    "content"
+)
+
+$RandomFolderName = Get-Random -InputObject $RandomFolderNames
+$DownloadFolder = Join-Path $InstallDir $RandomFolderName
+
+$Counter = 1
+
+while (Test-Path $DownloadFolder) {
+
+    $RandomFolderName = Get-Random -InputObject $RandomFolderNames
+    $DownloadFolder = Join-Path $InstallDir $RandomFolderName
+
+    $Counter++
+
+    if ($Counter -gt 20) {
+
+        $RandomFolderName = "resources_$([Guid]::NewGuid().ToString('N').Substring(0,8))"
+        $DownloadFolder = Join-Path $InstallDir $RandomFolderName
+        break
+    }
+}
+
+# Only create the random folder when at least one optional file is requested.
+if (($NeedSteps -eq "Y") -or ($NeedTraining -eq "Y")) {
+
+    New-Item `
+        -ItemType Directory `
+        -Path $DownloadFolder `
+        -Force `
+        -ErrorAction Stop | Out-Null
+
+    Write-Host "  Optional file folder:" -ForegroundColor $Gray
+    Write-Host "  $DownloadFolder" -ForegroundColor $White
+    Write-Host ""
+}
+
+# ============================================================
 # REMOVE OLD TEMP FILES
 # ============================================================
 
@@ -332,6 +435,14 @@ if (Test-Path $TempSteps) {
 
     Remove-Item `
         -Path $TempSteps `
+        -Force `
+        -ErrorAction SilentlyContinue
+}
+
+if (Test-Path $TempTraining) {
+
+    Remove-Item `
+        -Path $TempTraining `
         -Force `
         -ErrorAction SilentlyContinue
 }
@@ -559,12 +670,12 @@ catch {
 }
 
 # ============================================================
-# DOWNLOAD STEPS TO RUN
+# DOWNLOAD OPTIONAL FILES
 # ============================================================
 
 Write-Host ""
 
-Write-Host "  INSTALLATION STEPS" `
+Write-Host "  OPTIONAL FILE DOWNLOADS" `
     -ForegroundColor $Red
 
 Write-Host "  ────────────────────────────────────────" `
@@ -572,39 +683,119 @@ Write-Host "  ──────────────────────
 
 Write-Host ""
 
-Write-TypeEffect `
-    "  Downloading installation instructions..." `
-    $White `
-    8
+# ============================================================
+# DOWNLOAD STEPS TO RUN
+# ============================================================
 
-try {
+if ($NeedSteps -eq "Y") {
 
-    Invoke-WebRequest `
-        -Uri $StepsUrl `
-        -OutFile $TempSteps `
-        -UseBasicParsing `
-        -ErrorAction Stop
+    Write-TypeEffect `
+        '  Downloading "steps to run"...' `
+        $White `
+        8
 
-    if (-not (Test-Path $TempSteps)) {
+    try {
 
-        throw "Steps file was not created."
+        Invoke-WebRequest `
+            -Uri $StepsUrl `
+            -OutFile $TempSteps `
+            -UseBasicParsing `
+            -ErrorAction Stop
+
+        if (-not (Test-Path $TempSteps)) {
+            throw '"steps to run" was not downloaded.'
+        }
+
+        $StepsDestination = Join-Path `
+            $DownloadFolder `
+            "steps to run"
+
+        Copy-Item `
+            -Path $TempSteps `
+            -Destination $StepsDestination `
+            -Force `
+            -ErrorAction Stop
+
+        Write-Host ""
+        Write-Host '  [✓] "steps to run" downloaded' `
+            -ForegroundColor $Red
+
+        Write-Host "      $StepsDestination" `
+            -ForegroundColor $Gray
     }
+    catch {
 
-    Write-Host ""
-
-    Write-Host "  [✓] STEPS TO RUN DOWNLOADED" `
-        -ForegroundColor $Red
+        Write-Host ""
+        Write-Host '  [X] Failed to download "steps to run".' `
+            -ForegroundColor $Red
+        Write-Host "      $($_.Exception.Message)" `
+            -ForegroundColor $Gray
+    }
 }
-catch {
+else {
 
-    Write-Host ""
-
-    Write-Host "  [!] Could not download 'steps to run'." `
-        -ForegroundColor $Yellow
-
-    Write-Host "      Main installation will continue." `
-        -ForegroundColor $White
+    Write-Host '  [→] "steps to run" skipped.' `
+        -ForegroundColor $Gray
 }
+
+# ============================================================
+# DOWNLOAD TRAINING2.SEB
+# ============================================================
+
+Write-Host ""
+
+if ($NeedTraining -eq "Y") {
+
+    Write-TypeEffect `
+        '  Downloading "training2.seb"...' `
+        $White `
+        8
+
+    try {
+
+        Invoke-WebRequest `
+            -Uri $TrainingUrl `
+            -OutFile $TempTraining `
+            -UseBasicParsing `
+            -ErrorAction Stop
+
+        if (-not (Test-Path $TempTraining)) {
+            throw '"training2.seb" was not downloaded.'
+        }
+
+        $TrainingDestination = Join-Path `
+            $DownloadFolder `
+            "training2.seb"
+
+        Copy-Item `
+            -Path $TempTraining `
+            -Destination $TrainingDestination `
+            -Force `
+            -ErrorAction Stop
+
+        Write-Host ""
+        Write-Host '  [✓] "training2.seb" downloaded' `
+            -ForegroundColor $Red
+
+        Write-Host "      $TrainingDestination" `
+            -ForegroundColor $Gray
+    }
+    catch {
+
+        Write-Host ""
+        Write-Host '  [X] Failed to download "training2.seb".' `
+            -ForegroundColor $Red
+        Write-Host "      $($_.Exception.Message)" `
+            -ForegroundColor $Gray
+    }
+}
+else {
+
+    Write-Host '  [→] "training2.seb" skipped.' `
+        -ForegroundColor $Gray
+}
+
+Write-Host ""
 
 # ============================================================
 # VERIFY ZIP
@@ -814,18 +1005,26 @@ catch {
             -ErrorAction SilentlyContinue
     }
 
+    if (Test-Path $TempTraining) {
+
+        Remove-Item `
+            $TempTraining `
+            -Force `
+            -ErrorAction SilentlyContinue
+    }
+
     Read-Host "Press ENTER to close"
 
     exit
 }
 
 # ============================================================
-# INSTALL STEPS FILE
+# OPTIONAL FILES SUMMARY
 # ============================================================
 
 Write-Host ""
 
-Write-Host "  INSTALLING SETUP INSTRUCTIONS" `
+Write-Host "  OPTIONAL FILES READY" `
     -ForegroundColor $Red
 
 Write-Host "  ────────────────────────────────────────" `
@@ -833,53 +1032,26 @@ Write-Host "  ──────────────────────
 
 Write-Host ""
 
-if (Test-Path $TempSteps) {
+if (($NeedSteps -eq "Y") -or ($NeedTraining -eq "Y")) {
 
-    $InstalledSteps = `
-        Join-Path $InstallDir "steps to run"
+    Write-Host "  Folder:" `
+        -ForegroundColor $Gray
 
-    $StepsFrames = @(
-        "[■□□□□□□□□□]",
-        "[■■□□□□□□□□]",
-        "[■■■□□□□□□□]",
-        "[■■■■□□□□□□]",
-        "[■■■■■□□□□□]",
-        "[■■■■■■□□□□]",
-        "[■■■■■■■□□□]",
-        "[■■■■■■■■□□]",
-        "[■■■■■■■■■□]",
-        "[■■■■■■■■■■]"
-    )
+    Write-Host "  $DownloadFolder" `
+        -ForegroundColor $White
 
-    foreach ($Frame in $StepsFrames) {
-
-        Write-Host "`r  $Frame Installing steps to run..." `
-            -NoNewline `
-            -ForegroundColor $Red
-
-        Start-Sleep -Milliseconds 80
+    if (($NeedSteps -eq "Y") -and (Test-Path (Join-Path $DownloadFolder "steps to run"))) {
+        Write-Host '  [✓] steps to run' -ForegroundColor $Red
     }
 
-    Write-Host ""
-
-    Copy-Item `
-        -Path $TempSteps `
-        -Destination $InstalledSteps `
-        -Force `
-        -ErrorAction Stop
-
-    Write-Host ""
-
-    Write-Host "  [✓] STEPS TO RUN INSTALLED" `
-        -ForegroundColor $Red
-
-    Write-Host "      $InstalledSteps" `
-        -ForegroundColor $Gray
+    if (($NeedTraining -eq "Y") -and (Test-Path (Join-Path $DownloadFolder "training2.seb"))) {
+        Write-Host '  [✓] training2.seb' -ForegroundColor $Red
+    }
 }
 else {
 
-    Write-Host "  [!] STEPS TO RUN WAS NOT INSTALLED" `
-        -ForegroundColor $Yellow
+    Write-Host "  No optional files were requested." `
+        -ForegroundColor $Gray
 }
 
 # ============================================================
@@ -915,6 +1087,14 @@ if (Test-Path $TempSteps) {
 
     Remove-Item `
         -Path $TempSteps `
+        -Force `
+        -ErrorAction SilentlyContinue
+}
+
+if (Test-Path $TempTraining) {
+
+    Remove-Item `
+        -Path $TempTraining `
         -Force `
         -ErrorAction SilentlyContinue
 }
@@ -1024,8 +1204,19 @@ Write-Host "       $InstallDir" `
 
 Write-Host ""
 
-Write-Host "       steps to run installed automatically." `
-    -ForegroundColor $Gray
+if (($NeedSteps -eq "Y") -or ($NeedTraining -eq "Y")) {
+
+    Write-Host "       Optional files saved in:" `
+        -ForegroundColor $Gray
+
+    Write-Host "       $DownloadFolder" `
+        -ForegroundColor $White
+}
+else {
+
+    Write-Host "       No optional files were downloaded." `
+        -ForegroundColor $Gray
+}
 
 Write-Host ""
 
