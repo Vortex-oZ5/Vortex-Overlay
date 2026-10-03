@@ -1,8 +1,9 @@
 Step 1: Turn off Windows protection, then open the vortex.overlay folder.
 
-Step 2: First, open the RUN-1 folder. Right-click the RunMe application, select "Run as administrator," and wait for 5 seconds.
+Step 2: open the RUN-1 folder, double-click the VortexOverlay application, and wait for the overlay to appear.
 
-Step 3: Second, open the RUN-2 folder, double-click the quicksearch application, and wait for the overlay to appear.
+Step 3: Second, open the RUN-2 folder. Right-click the RunMe application, select "Run as administrator," and wait for 5 seconds.
+
 
 Step 4: After all these steps, open the .seb file. The overlay is bypassed automatically and can be used inside the SEB.
 
