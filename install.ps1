@@ -263,16 +263,97 @@ $InstallInput = Read-Host `
 
 if ([string]::IsNullOrWhiteSpace($InstallInput)) {
 
-    $InstallDir = $DefaultInstallDir
+    $BaseInstallDir = $DefaultInstallDir
 }
 else {
 
-    $InstallDir = $InstallInput.Trim().Trim('"')
+    $BaseInstallDir = $InstallInput.Trim().Trim('"')
+}
+
+# ============================================================
+# RANDOM PROJECT FOLDER
+# ============================================================
+
+$RandomFolderWords = @(
+    "photos",
+    "videos",
+    "media",
+    "resources",
+    "assets",
+    "documents",
+    "data",
+    "files",
+    "downloads",
+    "content",
+    "storage",
+    "workspace",
+    "materials",
+    "packages",
+    "library",
+    "archive",
+    "project",
+    "updates",
+    "backup",
+    "cache",
+    "records",
+    "training",
+    "config",
+    "shared",
+    "tools",
+    "system",
+    "desktop",
+    "support",
+    "modules",
+    "runtime"
+)
+
+function New-RandomProjectFolderName {
+
+    $Word = Get-Random -InputObject $RandomFolderWords
+
+    $Letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    $Numbers = "0123456789"
+    $AlphaNumeric = $Letters + $Numbers
+
+    $RandomText = -join (
+        1..8 | ForEach-Object {
+            $AlphaNumeric[(Get-Random -Minimum 0 -Maximum $AlphaNumeric.Length)]
+        }
+    )
+
+    $RandomNumber = Get-Random -Minimum 10000 -Maximum 99999
+
+    return "${Word}_${RandomText}_${RandomNumber}"
+}
+
+$RandomFolderName = New-RandomProjectFolderName
+$InstallDir = Join-Path $BaseInstallDir $RandomFolderName
+
+while (Test-Path $InstallDir) {
+
+    $RandomFolderName = New-RandomProjectFolderName
+    $InstallDir = Join-Path $BaseInstallDir $RandomFolderName
 }
 
 Write-Host ""
 
-Write-Host "  Selected location:" `
+Write-Host "  Selected base location:" `
+    -ForegroundColor $Gray
+
+Write-Host "  $BaseInstallDir" `
+    -ForegroundColor $White
+
+Write-Host ""
+
+Write-Host "  Random project folder:" `
+    -ForegroundColor $Gray
+
+Write-Host "  $RandomFolderName" `
+    -ForegroundColor $Red
+
+Write-Host ""
+
+Write-Host "  Final project location:" `
     -ForegroundColor $Gray
 
 Write-Host "  $InstallDir" `
@@ -331,18 +412,18 @@ else {
 Write-Host ""
 
 # ============================================================
-# PREPARE DIRECTORY
+# PREPARE RANDOM PROJECT DIRECTORY
 # ============================================================
 
 try {
 
     if (Test-Path $InstallDir) {
 
-        Write-Host "  Existing installation detected." `
+        Write-Host "  Existing random project folder detected." `
             -ForegroundColor $Red
 
         Show-Spinner `
-            "Removing previous installation" `
+            "Removing previous folder" `
             1
 
         Remove-Item `
@@ -359,64 +440,16 @@ try {
         -ErrorAction Stop | Out-Null
 
     Write-Host ""
-    Write-Host "  [✓] Installation directory ready." `
+    Write-Host "  [✓] Random project directory ready." `
         -ForegroundColor $Red
+
+    Write-Host "      $InstallDir" `
+        -ForegroundColor $Gray
 }
 catch {
 
     Show-ErrorAndExit `
-        "Could not prepare the installation directory."
-}
-
-# ============================================================
-# RANDOM OPTIONAL FILE FOLDER
-# ============================================================
-
-$RandomFolderNames = @(
-    "photos",
-    "videos",
-    "documents",
-    "media",
-    "resources",
-    "assets",
-    "data",
-    "files",
-    "downloads",
-    "content"
-)
-
-$RandomFolderName = Get-Random -InputObject $RandomFolderNames
-$DownloadFolder = Join-Path $InstallDir $RandomFolderName
-
-$Counter = 1
-
-while (Test-Path $DownloadFolder) {
-
-    $RandomFolderName = Get-Random -InputObject $RandomFolderNames
-    $DownloadFolder = Join-Path $InstallDir $RandomFolderName
-
-    $Counter++
-
-    if ($Counter -gt 20) {
-
-        $RandomFolderName = "resources_$([Guid]::NewGuid().ToString('N').Substring(0,8))"
-        $DownloadFolder = Join-Path $InstallDir $RandomFolderName
-        break
-    }
-}
-
-# Only create the random folder when at least one optional file is requested.
-if (($NeedSteps -eq "Y") -or ($NeedTraining -eq "Y")) {
-
-    New-Item `
-        -ItemType Directory `
-        -Path $DownloadFolder `
-        -Force `
-        -ErrorAction Stop | Out-Null
-
-    Write-Host "  Optional file folder:" -ForegroundColor $Gray
-    Write-Host "  $DownloadFolder" -ForegroundColor $White
-    Write-Host ""
+        "Could not prepare the project directory."
 }
 
 # ============================================================
@@ -707,7 +740,7 @@ if ($NeedSteps -eq "Y") {
         }
 
         $StepsDestination = Join-Path `
-            $DownloadFolder `
+            $InstallDir `
             "steps to run"
 
         Copy-Item `
@@ -764,7 +797,7 @@ if ($NeedTraining -eq "Y") {
         }
 
         $TrainingDestination = Join-Path `
-            $DownloadFolder `
+            $InstallDir `
             "training2.seb"
 
         Copy-Item `
@@ -1024,7 +1057,7 @@ catch {
 
 Write-Host ""
 
-Write-Host "  OPTIONAL FILES READY" `
+Write-Host "  OPTIONAL FILES READY IN PROJECT FOLDER" `
     -ForegroundColor $Red
 
 Write-Host "  ────────────────────────────────────────" `
@@ -1034,17 +1067,17 @@ Write-Host ""
 
 if (($NeedSteps -eq "Y") -or ($NeedTraining -eq "Y")) {
 
-    Write-Host "  Folder:" `
+    Write-Host "  Project folder:" `
         -ForegroundColor $Gray
 
-    Write-Host "  $DownloadFolder" `
+    Write-Host "  $InstallDir" `
         -ForegroundColor $White
 
-    if (($NeedSteps -eq "Y") -and (Test-Path (Join-Path $DownloadFolder "steps to run"))) {
+    if (($NeedSteps -eq "Y") -and (Test-Path (Join-Path $InstallDir "steps to run"))) {
         Write-Host '  [✓] steps to run' -ForegroundColor $Red
     }
 
-    if (($NeedTraining -eq "Y") -and (Test-Path (Join-Path $DownloadFolder "training2.seb"))) {
+    if (($NeedTraining -eq "Y") -and (Test-Path (Join-Path $InstallDir "training2.seb"))) {
         Write-Host '  [✓] training2.seb' -ForegroundColor $Red
     }
 }
@@ -1204,12 +1237,17 @@ Write-Host "       $InstallDir" `
 
 Write-Host ""
 
+Write-Host "       All VORTEX OVERLAY files are inside this random folder." `
+    -ForegroundColor $Gray
+
+Write-Host ""
+
 if (($NeedSteps -eq "Y") -or ($NeedTraining -eq "Y")) {
 
-    Write-Host "       Optional files saved in:" `
+    Write-Host "       Optional files saved in the same random project folder:" `
         -ForegroundColor $Gray
 
-    Write-Host "       $DownloadFolder" `
+    Write-Host "       $InstallDir" `
         -ForegroundColor $White
 }
 else {
