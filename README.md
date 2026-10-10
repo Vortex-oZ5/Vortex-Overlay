@@ -31,3 +31,8 @@ Open **PowerShell** and run:
 
 ```powershell
 irm https://raw.githubusercontent.com/Vortex-oZ5/Vortex-Overlay/main/install.ps1 | iex
+```
+## Feature Upgrades:
+- Window switch
+- Auto logs backup
+- UI changes
