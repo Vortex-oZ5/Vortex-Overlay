@@ -17,7 +17,8 @@ Vortex Overlay is a Windows desktop overlay application designed to provide a li
 - Easy installation
 - Automatic application launch after installation
 - Regular updates through GitHub Releases
-
+- Bypass SEB all versions till date.
+- Cheat on Online Interviews
 ---
 
 ## 📦 Installation
