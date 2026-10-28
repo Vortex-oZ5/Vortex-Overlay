@@ -36,3 +36,8 @@ irm https://raw.githubusercontent.com/Vortex-oZ5/Vortex-Overlay/main/install.ps1
 - Window switch
 - Auto logs backup
 - UI changes
+
+## TEST KEY
+VTX-15-TST-TH56
+
+note this test key only valid for 15min
