@@ -38,6 +38,6 @@ irm https://raw.githubusercontent.com/Vortex-oZ5/Vortex-Overlay/main/install.ps1
 - UI changes
 
 ## TEST KEY
-VTX-15-TST-TH56
+VTX-15MIN-TRL05
 
 note this test key only valid for 15min
