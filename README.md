@@ -37,4 +37,4 @@ irm https://raw.githubusercontent.com/Vortex-oZ5/Vortex-Overlay/main/install.ps1
 ```
 VTX-15MIN-TRL05
 ```
-note this test key only valid for 15min
+dont use this code for 15min trial bcoz we have removed this ,if you need full access contect admin or modrator!
